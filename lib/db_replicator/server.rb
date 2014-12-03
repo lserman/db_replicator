@@ -5,9 +5,8 @@ module DbReplicator
 
     attr_accessor :identifier, :ip, :app_path, :environment, :user
 
-    def initialize(identifier, attributes = {})
-      @identifier = identifier
-      super(attributes)
+    def initialize
+      yield self if block_given?
     end
 
     def transfer_database_to(server)
