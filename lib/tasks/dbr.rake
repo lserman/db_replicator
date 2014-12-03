@@ -2,6 +2,13 @@ db_replicator_lib = File.expand_path(File.dirname(File.dirname(__FILE__)))
 require "#{db_replicator_lib}/db_replicator"
 
 namespace :dbr do
+
+  task import: :environment do
+    host = DbReplicator.configuration.servers.find { |s| s.identifier == ENV['FROM'] }
+    destination = DbReplicator.configuration.servers.find { |s| s.identifier == ENV['TO'] }
+    host.transfer_database_to(destination)
+  end
+
   desc 'Imports the production db into the current machines environment db'
   task prod_to_local: [:environment, :download_prod_db] do
     importer = DbReplicator::Importer.new('development')

@@ -28,6 +28,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rails', '>= 3'
   spec.add_runtime_dependency 'colorize'
 
+  spec.add_dependency 'net-ssh'
+  spec.add_dependency 'net-scp'
+
   spec.required_ruby_version = '~> 2.0'
 
 end

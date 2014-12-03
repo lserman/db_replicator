@@ -1,10 +1,18 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
+
+require 'net/ssh'
+require 'net/scp'
+
 require 'db_replicator/version'
 require 'db_replicator/tasks'
 require 'db_replicator/configuration'
+require 'db_replicator/logger'
 require 'db_replicator/downloader'
 require 'db_replicator/importer'
 require 'db_replicator/uploader'
+require 'db_replicator/server'
+require 'db_replicator/localhost'
+require 'db_replicator/database_configuration'
 require 'colorize'
 
 module DbReplicator
