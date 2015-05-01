@@ -51,7 +51,8 @@ module DbReplicator
 
       def dbconfig
         @_dbconfig ||= begin
-          hash = JSON.parse execute_command(%Q(bundle exec rails runner "puts ActiveRecord::Base.configurations['#{environment}'].to_json"))
+          hash = execute_command(%Q(RAILS_ENV=#{environment} bundle exec rails runner 'puts ActiveRecord::Base.configurations[:#{environment}.to_s].to_json'))
+          hash = JSON.parse hash
           DatabaseConfiguration.new(hash)
         end
       end
@@ -63,22 +64,13 @@ module DbReplicator
       end
 
       def execute_command(command, in_path = @app_path)
-        output = ""
+        stdout = ""
         Net::SSH.start(@ip, user) do |ssh|
-          ssh.open_channel do |channel|
-            channel.exec('bash -l') do |ch, success|
-              ch.send_data "source $HOME/.bashrc\n"
-              ch.send_data "source $HOME/.bash_profile\n"
-              ch.send_data "source $HOME/.rbenvrc\n"
-              ch.send_data "cd #{in_path}\n"
-              ch.send_data "echo | #{command}\n"
-              ch.send_data "exit\n"
-              ch.on_data { |ch, data| output += data }
-            end
-            channel.wait
+          ssh.exec "source $HOME/.bashrc; source $HOME/.bash_profile; source $HOME/.rbenvrc; cd #{in_path}; #{command}" do |ch, stream, data|
+            stdout << data if stream == :stdout
           end
         end
-        output
+        stdout
       end
 
       def mysqldump_destination
